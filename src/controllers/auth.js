@@ -1,8 +1,10 @@
 const UserModel = require('../models/User');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');  // Importer jsonwebtoken pour générer le token
 
-// Contrôleur pour l'inscription d'un utilisateur
+// Contrôleur pour l'inscription
 module.exports = {
+  // Inscription (registre déjà implémenté)
   register: async (req, res) => {
     try {
       const { firstname, lastname, email, password } = req.body;
@@ -48,6 +50,55 @@ module.exports = {
     } catch (error) {
       res.status(500).send({
         message: error.message || 'Erreur lors de l\'inscription de l\'utilisateur.'
+      });
+    }
+  },
+
+  // Login : authentification et génération de JWT
+  login: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      // Vérifier que l'email et le mot de passe sont fournis
+      if (!email || !password) {
+        return res.status(400).send({
+          error: 'Email et mot de passe sont requis.'
+        });
+      }
+
+      // Vérifier si l'utilisateur existe
+      const user = await UserModel.findOne({ email });
+      if (!user) {
+        return res.status(400).send({
+          error: 'Utilisateur non trouvé.'
+        });
+      }
+
+      // Comparer le mot de passe fourni avec celui en base de données
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).send({
+          error: 'Mot de passe incorrect.'
+        });
+      }
+
+      // Générer un JWT
+      const token = jwt.sign(
+        { userId: user._id, email: user.email },  // Payload
+        process.env.JWT_SECRET,                    // Clé secrète (à définir dans .env)
+        { expiresIn: '1h' }                        // Expiration du token
+      );
+
+      // Répondre avec le token
+      res.status(200).send({
+        success: true,
+        message: 'Connexion réussie.',
+        token
+      });
+
+    } catch (error) {
+      res.status(500).send({
+        message: error.message || 'Erreur lors de la connexion.'
       });
     }
   }

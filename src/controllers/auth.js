@@ -14,6 +14,14 @@ module.exports = {
         });
       }
 
+      // Vérifier si un utilisateur existe déjà avec cet email
+      const existingUser = await UserModel.findOne({ email });
+      if (existingUser) {
+        return res.status(400).send({
+          error: 'Un utilisateur avec cet email existe déjà.'
+        });
+      }
+
       // Hashage du mot de passe
       const hashedPassword = await bcrypt.hash(password, 10);
 

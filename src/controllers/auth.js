@@ -1,33 +1,46 @@
-const UserModel = require('./../models/user');
+const UserModel = require('../models/User');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { verifyUser } = require('../validator/user');
 
+// Contrôleur pour l'inscription d'un utilisateur
 module.exports = {
-    // POST /register Creer un utilisateur
-    register: async (req, res) => {
-        try {
-            verifyUser(req.body);
-            const { firstname, lastname, email, password } = req.body;
-            const hash = await bcrypt.hash(password, 10);
-            const newUser = new UserModel({
-                firstname,
-                lastname,
-                email, // email: email
-                password: hash
-            });
+  register: async (req, res) => {
+    try {
+      const { firstname, lastname, email, password } = req.body;
 
-            newUser.save();
-            res.status(201).send({
-                id: newUser._id,
-                lastname: newUser.lastname,
-                firstname: newUser.firstname,
-                email: newUser.email
-            });
-        } catch (error) {
-            res.send({
-                message: error.message || 'Cannot register User'
-            });
+      // Vérifier que tous les champs nécessaires sont fournis
+      if (!firstname || !lastname || !email || !password) {
+        return res.status(400).send({
+          error: 'Tous les champs sont requis (firstname, lastname, email, password).'
+        });
+      }
+
+      // Hashage du mot de passe
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Création de l'utilisateur
+      const newUser = new UserModel({
+        firstname,
+        lastname,
+        email,
+        password: hashedPassword
+      });
+
+      // Sauvegarde dans la base de données
+      await newUser.save();
+
+      // Réponse de succès avec les informations de l'utilisateur (sans mot de passe)
+      res.status(201).send({
+        success: true,
+        user: {
+          firstname,
+          lastname,
+          email
         }
-    },
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message || 'Erreur lors de l\'inscription de l\'utilisateur.'
+      });
+    }
+  }
 };

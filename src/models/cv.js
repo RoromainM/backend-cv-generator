@@ -8,7 +8,7 @@ const CVSchema = new Schema(
             ref: 'User',
             required: true,
         },
-        personalInfo: {
+        information: {
             name: { type: String, required: true },
             description: { type: String, required: true },
         },
@@ -19,14 +19,14 @@ const CVSchema = new Schema(
                 year: { type: String, required: true },
             },
         ],
-        workExperience: [
+        experience: [
             {
                 role: { type: String, required: true },
                 company: { type: String, required: true },
                 description: { type: String, required: true },
             },
         ],
-        visibility: {
+        visibilite: {
             type: Boolean,
             default: true, // Visible par défaut
         },

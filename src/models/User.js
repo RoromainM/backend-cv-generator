@@ -22,7 +22,7 @@ const UserSchema = new Schema(
         },
         profileVisibility: {
             type: Boolean,
-            default: true, // CV visible par défaut
+            default: true,
         },
     },
     {

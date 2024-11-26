@@ -3,12 +3,12 @@ const Schema = mongoose.Schema;
 
 const RecommendationSchema = new Schema(
     {
-        fromUser: {
+        Author: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
         },
-        toCV: {
+        CVNote: {
             type: Schema.Types.ObjectId,
             ref: 'CV',
             required: true,

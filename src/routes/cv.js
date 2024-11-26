@@ -1,17 +1,14 @@
 const express = require('express');
+const cvController = require('../controllers/cv');
 const router = express.Router();
-const { createCv, getCvs, getCv, updateCv } = require('../controllers/cv');
 
 // Route pour créer un CV
-router.post('/', createCv);
+router.post('/', cvController.createCv);
 
-// Route pour récupérer tous les CVs
-router.get('/', getCvs);
+// Route pour récupérer un CV
+router.get('/:id', cvController.getCvs);
 
-// Route pour récupérer un CV spécifique par ID
-router.get('/:id', getCv);
-
-// Route pour mettre à jour un CV par ID
-router.put('/:id', updateCv);
+// Route pour modifier un CV
+router.patch('/:id', cvController.updateCv);
 
 module.exports = router;

@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const RecommendationSchema = new Schema(
     {
-        Author: {
+        author: {
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,

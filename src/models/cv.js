@@ -28,7 +28,7 @@ const CVSchema = new Schema(
         ],
         visibilite: {
             type: Boolean,
-            default: true, // Visible par défaut
+            default: true,
         },
     },
     {

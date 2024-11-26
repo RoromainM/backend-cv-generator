@@ -19,11 +19,7 @@ const UserSchema = new Schema(
         password: {
             type: String,
             required: true,
-        },
-        profileVisibility: {
-            type: Boolean,
-            default: true,
-        },
+        }
     },
     {
         timestamps: true,

@@ -12,7 +12,11 @@
   "description": "",
   "dependencies": {
     "backend-cv-generator": "file:",
+<<<<<<< HEAD
     "bcrypt": "^5.1.1",
+=======
+    "cors": "^2.8.5",
+>>>>>>> bf2d1a9 (wip)
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",

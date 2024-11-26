@@ -1,8 +1,10 @@
 const express = require('express');
 const cvRouter = require('./cv');
+const authRouter = require('./auth');
 
 const app = express();
 
-app.use('/api/cv', cvRouter);
+app.use('/cv', cvRouter);
+app.use('/auth', authRouter);
 
 module.exports = app;

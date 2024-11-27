@@ -5,7 +5,7 @@ const v_authMiddleware = require('../middleware/jwt');
 
 router.post('/', v_authMiddleware, v_reconnandationController.createRecommandataion);
 
-router.get('/:CVNote', v_authMiddleware, v_reconnandationController.getRecommendationsForCV);
+router.get('/:CVNote', v_reconnandationController.getRecommendationsForCV);
 
 router.delete('/:id', v_authMiddleware, v_reconnandationController.deleteRecommendation);
 

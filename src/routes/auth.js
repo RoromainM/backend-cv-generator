@@ -15,4 +15,7 @@ router.get('/protected', jwtMiddleware, (req, res) => {
     });
   });
 
+router.post('/logout', jwtMiddleware, authController.logout);  
+
+
 module.exports = router;

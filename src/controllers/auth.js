@@ -87,5 +87,17 @@ module.exports = {
         message: error.message || 'Erreur lors de la connexion.'
       });
     }
-  }
+  },
+
+  logout: (req, res) => {
+    // Côté serveur, nous ne pouvons pas supprimer le token,
+    // mais tu peux gérer une blacklist de tokens pour invalider les tokens à la déconnexion si nécessaire.
+    
+    // Par exemple, tu pourrais avoir un mécanisme côté serveur pour bloquer le token (non montré ici).
+    
+    res.status(200).send({
+      success: true,
+      message: 'Déconnexion réussie.'
+    });
+  },
 };

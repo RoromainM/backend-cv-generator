@@ -2,86 +2,77 @@ const CV = require('../models/CVModel');
 const Recommendation = require('../models/RecommandationModel');
 
 module.exports = {
-    createRecommandataion : async (req, res) => {
-        const { CVNote, content } = req.body;
+    createRecommandataion : async (p_req, p_res) => {
+        const { CVNote, content } = p_req.body;
 
         try {
-            const targetCV = await CV.findById(CVNote);
-            if (!targetCV) {
-                return res.status(404).json({ message: 'CV non trouvé.' });
+            const v_targetCV = await CV.findById(CVNote);
+            if (!v_targetCV) {
+                return p_res.status(404).json({ message: 'CV non trouvé.' });
             }
 
-            console.log('Utilisateur connecté (ID) :', req.user.userId);
-            console.log('CV demandé (ID) :', CVNote);
-
-            const recommendation = new Recommendation({
-                author: req.user.userId,
+            const v_recommendation = new Recommendation({
+                author: p_req.user.userId,
                 CVNote,
                 content,
             });
 
-            await recommendation.save();
-            res.status(200).json({
+            await v_recommendation.save();
+            p_res.status(200).json({
                 message: 'Recommandation ajoutée avec succès.',
-                recommendation,
+                v_recommendation,
             });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Erreur lors de l\'ajout de la recommandation.' });
+            p_res.status(500).json({ message: 'Erreur lors de l\'ajout de la recommandation.' });
         }
     },
 
-    getRecommendationsForCV : async (req, res) => {
-        const { CVNote } = req.params;
+    getRecommendationsForCV : async (p_req, p_res) => {
+        const { CVNote } = p_req.params;
 
         try {
-            const recommendations = await Recommendation.find({ CVNote })
+            const v_recommendations = await Recommendation.find({ CVNote })
                 .populate('author', 'firstname lastname')
                 .populate('CVNote', 'personalInfo');
 
-            res.status(200).json(recommendations);
+            p_res.status(200).json(v_recommendations);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Erreur lors de la récupération des recommandations.' });
+            p_res.status(500).json({ message: 'Erreur lors de la récupération des recommandations.' });
         }
     },
 
-    deleteRecommendation : async (req, res) => {
-        const { id } = req.params;
+    deleteRecommendation : async (p_req, p_res) => {
+        const { id } = p_req.params;
 
         try {
-            const recommendation = await Recommendation.findById(id).populate('CVNote');
-            if (!recommendation) {
-                return res.status(404).json({ message: 'Recommandation non trouvée.' });
+            const v_recommendation = await Recommendation.findById(id).populate('CVNote');
+            if (!v_recommendation) {
+                return p_res.status(404).json({ message: 'Recommandation non trouvée.' });
             }
 
-
-            console.log('Utilisateur du CV NOTE (ID) :', recommendation.CVNote.user._id.toString().trim());
-            console.log('utilisateur connecte : ', req.user.userId.trim())
-
-            const v_bool = (recommendation.CVNote.user._id.toString() == req.user.userId);
-            console.log('resultat : ', v_bool)
-           if ( recommendation.author.toString() !== req.user.userId && recommendation.CVNote.user._id.toString() !== req.user.userId) {
-                return res.status(403).json({ message: 'Action non autorisée.' });
+           if ( v_recommendation.author.toString() !== p_req.user.userId && v_recommendation.CVNote.user._id.toString() !== p_req.user.userId) {
+                return p_res.status(403).json({ message: 'Action non autorisée.' });
             }
 
-            await recommendation.deleteOne();
-            res.status(200).json({ message: 'Recommandation supprimée avec succès.' });
+            await v_recommendation.deleteOne();
+            p_res.status(200).json({ message: 'Recommandation supprimée avec succès.' });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Erreur lors de la suppression de la recommandation.' });
+            p_res.status(500).json({ message: 'Erreur lors de la suppression de la recommandation.' });
         }
     },
 
-    getRecommendationsForUser : async (req, res) => {
+    getRecommendationsForUser : async (p_req, p_res) => {
         try {
-            const recommendations = await Recommendation.find({ author: req.user.userId })
+            const v_recommendations = await Recommendation.find({ author: p_req.user.userId })
                 .populate('CVNote', 'personalInfo');
 
-            res.status(200).json(recommendations);
+            p_res.status(200).json(v_recommendations);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Erreur lors de la récupération des recommandations.' });
+            p_res.status(500).json({ message: 'Erreur lors de la récupération des recommandations.' });
         }
     }
 

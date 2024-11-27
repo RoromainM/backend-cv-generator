@@ -9,10 +9,6 @@ module.exports = {
                 return res.status(400).json({ message: 'No data provided to create CV' });
             }
 
-            if (!req.body.name || !req.body.skills) {
-                return res.status(400).json({ message: 'Name and skills are required to create CV' });
-            }
-
             const cv = new CvModel(req.body);
             await cv.save();
             res.status(201).json({

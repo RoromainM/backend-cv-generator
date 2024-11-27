@@ -88,16 +88,48 @@ module.exports = {
       });
     }
   },
-
+  
+// Deconnexion d'un utilisateur
   logout: (req, res) => {
-    // Côté serveur, nous ne pouvons pas supprimer le token,
-    // mais tu peux gérer une blacklist de tokens pour invalider les tokens à la déconnexion si nécessaire.
-    
-    // Par exemple, tu pourrais avoir un mécanisme côté serveur pour bloquer le token (non montré ici).
-    
     res.status(200).send({
       success: true,
       message: 'Déconnexion réussie.'
     });
   },
+
+// Suppression d'un utilisateur
+deleteUser: async (req, res) => {
+    try {
+      const userId = req.params.id; // ID de l'utilisateur à supprimer
+  
+      // Vérifier si l'utilisateur connecté a le droit de supprimer cet utilisateur
+      if (req.user.userId !== userId) {
+        return res.status(403).send({
+          error: 'Vous n\'êtes pas autorisé à supprimer cet utilisateur.'
+        });
+      }
+  
+      // Rechercher et supprimer l'utilisateur dans la base de données
+      const user = await UserModel.findByIdAndDelete(userId);
+  
+      // Vérifier si l'utilisateur existe
+      if (!user) {
+        return res.status(404).send({
+          error: 'Utilisateur non trouvé.'
+        });
+      }
+  
+      res.status(200).send({
+        success: true,
+        message: 'Utilisateur supprimé avec succès.'
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message || 'Erreur lors de la suppression de l\'utilisateur.'
+      });
+    }
+  }
+  
+
+
 };

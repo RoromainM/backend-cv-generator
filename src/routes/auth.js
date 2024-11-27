@@ -17,5 +17,6 @@ router.get('/protected', jwtMiddleware, (req, res) => {
 
 router.post('/logout', jwtMiddleware, authController.logout);  
 
+router.delete('/delete/:id', jwtMiddleware, authController.deleteUser);
 
 module.exports = router;

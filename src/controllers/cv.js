@@ -36,7 +36,7 @@ module.exports = {
     },
 
     // Récupération d'un CV par ID
-    getCv: async (req, res) => {
+    getCvById: async (req, res) => {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -81,6 +81,30 @@ module.exports = {
         } catch (error) {
             console.error('Error updating CV:', error);
             res.status(500).json({ message: 'Failed to update CV', error: error.message });
+        }
+    },
+
+    deleteCv: async (req, res) => {
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid CV ID format' });
+        }
+
+        try {
+            const cv = await CvModel.findByIdAndDelete(id);
+
+            if (!cv) {
+                return res.status(404).json({ message: 'CV not found' });
+            }
+
+            res.status(200).json({
+                message: 'CV successfully deleted',
+                cv: cv
+            });
+        } catch (error) {
+            console.error('Error deleting CV:', error);
+            res.status(500).json({ message: 'Failed to delete CV', error: error.message });
         }
     }
     

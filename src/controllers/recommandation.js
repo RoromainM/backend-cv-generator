@@ -74,6 +74,34 @@ module.exports = {
             console.error(error);
             p_res.status(500).json({ message: 'Erreur lors de la récupération des recommandations.' });
         }
+    },
+
+    updateRecommendation: async (p_req, p_res) => {
+        const { id } = p_req.params;
+        const { content } = p_req.body;
+
+        try {
+            const v_recommendation = await Recommendation.findById(id);
+            if (!v_recommendation) {
+                return p_res.status(404).json({ message: 'Recommandation non trouvée.' });
+            }
+
+            if (v_recommendation.author.toString() !== p_req.user.userId) {
+                return p_res.status(403).json({ message: 'Action non autorisée.' });
+            }
+
+            v_recommendation.content = content;
+
+            await v_recommendation.save();
+
+            p_res.status(200).json({
+                message: 'Recommandation modifiée avec succès.',
+                v_recommendation,
+            });
+        } catch (error) {
+            console.error(error);
+            p_res.status(500).json({ message: 'Erreur lors de la modification de la recommandation.' });
+        }
     }
 
 }

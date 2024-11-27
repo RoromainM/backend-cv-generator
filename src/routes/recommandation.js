@@ -11,4 +11,6 @@ router.delete('/:id', v_authMiddleware, v_reconnandationController.deleteRecomme
 
 router.get('/', v_authMiddleware, v_reconnandationController.getRecommendationsForUser);
 
+router.put('/:id', v_authMiddleware, v_reconnandationController.updateRecommendation);
+
 module.exports = router;

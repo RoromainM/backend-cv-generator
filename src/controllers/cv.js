@@ -1,4 +1,4 @@
-const CvModel = require('../models/cv');
+const CvModel = require('../models/CVModel');
 const mongoose = require('mongoose');
 
 module.exports = {

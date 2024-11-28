@@ -67,8 +67,9 @@ module.exports = {
     getRecommendationsForUser : async (p_req, p_res) => {
         try {
             const v_recommendations = await Recommendation.find({ author: p_req.user.userId })
-                .populate('CVNote', 'personalInfo');
-
+                .populate('author', 'firstname lastname')
+                .populate('CVNote', 'information')
+                .exec();
             p_res.status(200).json(v_recommendations);
         } catch (error) {
             console.error(error);

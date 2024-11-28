@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const v_reconnandationController = require('../controllers/recommandation');
+const v_recommandationController = require('../controllers/recommandation');
 const v_authMiddleware = require('../middleware/jwt');
 
-router.post('/', v_authMiddleware, v_reconnandationController.createRecommandataion);
+router.post('/', v_authMiddleware, v_recommandationController.createRecommandataion);
 
-router.get('/:CVNote', v_reconnandationController.getRecommendationsForCV);
+router.get('/:CVNote', v_recommandationController.getRecommendationsForCV);
 
-router.delete('/:id', v_authMiddleware, v_reconnandationController.deleteRecommendation);
+router.delete('/:id', v_authMiddleware, v_recommandationController.deleteRecommendation);
 
-router.get('/', v_authMiddleware, v_reconnandationController.getRecommendationsForUser);
+router.get('/', v_authMiddleware, v_recommandationController.getRecommendationsForUser);
 
-router.put('/:id', v_authMiddleware, v_reconnandationController.updateRecommendation);
+router.patch('/:id', v_authMiddleware, v_recommandationController.updateRecommendation);
 
 module.exports = router;

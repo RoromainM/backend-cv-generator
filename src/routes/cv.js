@@ -1,6 +1,7 @@
 const express = require('express');
 const cvController = require('../controllers/cv');
 const router = express.Router();
+const v_authMiddleware = require('../middleware/jwt');
 
 // Route pour créer un CV
 router.post('/', cvController.createCv);
@@ -12,9 +13,9 @@ router.get('/', cvController.getCvs);
 router.get('/:id', cvController.getCvById);
 
 // Route pour modifier un CV
-router.patch('/:id', cvController.updateCv);
+router.patch('/:id', v_authMiddleware, cvController.updateCv);
 
 // route pour supprimer un CV
-router.delete('/:id', cvController.deleteCv);
+router.delete('/:id', v_authMiddleware, cvController.deleteCv);
 
 module.exports = router;

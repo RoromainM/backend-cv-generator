@@ -55,57 +55,90 @@ module.exports = {
         }
     },
 
+    getVisibleCvs: async (req, res) => {
+        try {
+            const cvs = await CvModel.find({ visibilite: true });
+    
+            if (cvs.length === 0) {
+                return res.status(404).json({ message: 'No visible CVs found' });
+            }
+    
+            console.log('Visible CVs:', cvs);
+    
+            res.status(200).json(cvs);
+        } catch (error) {
+            console.error('Error retrieving visible CVs:', error);
+            res.status(500).json({ message: 'Failed to retrieve visible CVs', error: error.message });
+        }
+    },
+    
+    
+
     // Mise à jour d'un CV par ID
     updateCv: async (req, res) => {
         const { id } = req.params;
-
+        const updates = req.body;
+    
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Invalid CV ID format' });
+            return res.status(400).json({ message: 'Format de l\'ID CV invalide.' });
         }
-
-        if (!req.body || Object.keys(req.body).length === 0) {
-            return res.status(400).json({ message: 'No data provided to update CV' });
+    
+        if (!updates || Object.keys(updates).length === 0) {
+            return res.status(400).json({ message: 'Aucune donnée fournie pour mettre à jour le CV.' });
         }
-
+    
         try {
-            const cv = await CvModel.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
-
+            const cv = await CvModel.findById(id);
             if (!cv) {
-                return res.status(404).json({ message: 'CV not found' });
+                return res.status(404).json({ message: 'CV non trouvé.' });
             }
 
+            if (cv.user.toString() !== req.user.userId) {
+                return res.status(403).json({ message: 'Action non autorisée.' });
+            }
+    
+            Object.keys(updates).forEach((key) => {
+                cv[key] = updates[key];
+            });
+    
+            await cv.save();
+    
             res.status(200).json({
-                message: 'CV successfully updated',
-                cv: cv
+                message: 'CV mis à jour avec succès.',
+                cv,
             });
         } catch (error) {
-            console.error('Error updating CV:', error);
-            res.status(500).json({ message: 'Failed to update CV', error: error.message });
+            console.error('Erreur lors de la mise à jour du CV :', error);
+            res.status(500).json({ message: 'Erreur lors de la mise à jour du CV.', error: error.message });
         }
-    },
+    },    
 
     deleteCv: async (req, res) => {
         const { id } = req.params;
-
+    
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Invalid CV ID format' });
+            return res.status(400).json({ message: 'Format de l\'ID CV invalide.' });
         }
-
+    
         try {
-            const cv = await CvModel.findByIdAndDelete(id);
-
+            const cv = await CvModel.findById(id);
             if (!cv) {
-                return res.status(404).json({ message: 'CV not found' });
+                return res.status(404).json({ message: 'CV non trouvé.' });
             }
-
-            res.status(200).json({
-                message: 'CV successfully deleted',
-                cv: cv
-            });
+    
+            // Vérification des permissions
+            if (cv.user.toString() !== req.user.userId) {
+                return res.status(403).json({ message: 'Action non autorisée.' });
+            }
+    
+            await cv.deleteOne();
+            res.status(200).json({ message: 'CV supprimé avec succès.' });
         } catch (error) {
-            console.error('Error deleting CV:', error);
-            res.status(500).json({ message: 'Failed to delete CV', error: error.message });
+            console.error('Erreur lors de la suppression du CV :', error);
+            res.status(500).json({ message: 'Erreur lors de la suppression du CV.', error: error.message });
         }
-    }
+    },
+
+    
     
 };

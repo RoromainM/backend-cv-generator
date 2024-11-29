@@ -3,12 +3,8 @@ const router = express.Router();
 const authController = require('../controllers/auth');
 const jwtMiddleware = require('../middleware/jwt');
 
-/**
- * @swagger
- * tags:
- *   name: Authentication
- *   description: API for user authentication
- */
+
+
 
 /**
  * @swagger
@@ -79,12 +75,7 @@ const jwtMiddleware = require('../middleware/jwt');
  */
 router.post('/register', authController.register);
 
-/**
- * @swagger
- * tags:
- *   name: Login
- *   description: API for user login
- */
+
 
 /**
  * @swagger
@@ -93,7 +84,7 @@ router.post('/register', authController.register);
  *     summary: User login
  *     description: Allows a user to log in with the provided credentials (email and password).
  *     tags:
- *       - Login
+ *       - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -136,24 +127,7 @@ router.post('/register', authController.register);
 router.post('/login', authController.login);
 
 
-router.get('/protected', jwtMiddleware, (req, res) => {
-  if (!req.user) {
-    return res.status(400).send({ error: 'Utilisateur non trouvé.' });
-  }
 
-  res.status(200).send({
-    success: true,
-    message: 'Accès autorisé à la ressource protégée.',
-    user: req.user 
-  });
-});
-
-/**
- * @swagger
- * tags:
- *   name: Logout 
- *   description: API for logout user
- */
 
 /**
  * @swagger
@@ -162,7 +136,7 @@ router.get('/protected', jwtMiddleware, (req, res) => {
  *     summary: User logout
  *     description: Logs out the user by invalidating the JWT token. Requires email, password, and token for authentication.
  *     tags:
- *       - Logout
+ *       - Authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -212,10 +186,122 @@ router.get('/protected', jwtMiddleware, (req, res) => {
  *         description: Internal server error.
  */
 router.post('/logout', jwtMiddleware, authController.logout);
+
+
+
+
+/**
+ * @swagger
+ * /api/auth/delete/{id}:
+ *   delete:
+ *     summary: Delete a user by ID
+ *     description: Deletes a user with the specified ID from the system. Requires authentication with a valid JWT token.
+ *     tags:
+ *       - Authentication
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The ID of the user to delete.
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "12345"
+ *     responses:
+ *       200:
+ *         description: User successfully deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the deletion was successful.
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   description: A message indicating the result of the deletion.
+ *                   example: "Utilisateur supprimé avec succès."
+ *       400:
+ *         description: Bad request - Invalid ID format or missing ID.
+ *       401:
+ *         description: Unauthorized - Missing or invalid JWT token.
+ *       404:
+ *         description: Not Found - The user with the specified ID does not exist.
+ *       500:
+ *         description: Internal server error.
+ */
 router.delete('/delete/:id', jwtMiddleware, authController.deleteUser);
 
-router.patch('/update/:id', jwtMiddleware, authController.updateUser);
 
+
+/**
+ * @swagger
+ * /api/auth/update/{id}:
+ *   patch:
+ *     summary: Update a user's information
+ *     description: Updates the information of an existing user. Requires authentication with a valid JWT token.
+ *     tags:
+ *       - Authentication
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: The ID of the user to update.
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "12345"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstname:
+ *                 type: string
+ *                 description: The first name of the user.
+ *                 example: Julien
+ *               lastname:
+ *                 type: string
+ *                 description: The last name of the user.
+ *                 example: Dodo
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email address.
+ *                 example: julien@exemple.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: The user's password.
+ *                 example: Julien123
+ *     responses:
+ *       200:
+ *         description: User information successfully updated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   description: Indicates whether the update was successful.
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   description: A message confirming the update.
+ *                   example: "Informations de l'utilisateur mises à jour avec succès."
+ *       400:
+ *         description: Bad request - Invalid input or missing required fields.
+ *       401:
+ *         description: Unauthorized - Missing or invalid JWT token.
+ *       404:
+ *         description: Not Found - The user with the specified ID does not exist.
+ *       500:
+ *         description: Internal server error.
+ */
+router.patch('/update/:id', jwtMiddleware, authController.updateUser);
 
 
 

@@ -1,11 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const authRoutes = require('./routes/auth');
-
+const authRoutes = require('./routes/auth'); // Route d'authentification
+const { swaggerUi, swaggerSpec } = require('./config/swagger'); // Importer la configuration de Swagger
 const cors = require('cors');
 const app = express();
-const apiRouter = require('./routes');
+const apiRouter = require('./routes'); // Autres routes de ton API
+
+
+
 
 // Middleware pour sécuriser les headers et gérer les CORS
 app.use(cors());
@@ -23,16 +26,22 @@ mongoose
         console.error('❌ Unable to connect to the database: ', error);
     });
 
-
-// Utilisation des routes
 app.use('/api', apiRouter);
 
-// Démarrage du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
 });
 
+// Middleware pour servir Swagger UI à l'URL /api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+
 app.get('/', (req, res) => {
-    res.send('Hello word');
+  res.send('Bienvenue dans l\'API');
+});
+
+// Autres routes 
+app.get('/user', (req, res) => {
+  res.send('User data');
 });

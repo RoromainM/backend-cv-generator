@@ -66,7 +66,11 @@ module.exports = {
 
     getRecommendationsForUser : async (p_req, p_res) => {
         try {
-            const v_recommendations = await Recommendation.find({ author: p_req.user.userId })
+            const userCVs = await CV.find({ user: p_req.user.userId }).select('_id');
+
+            const userCVIds = userCVs.map(cv => cv._id);
+
+            const v_recommendations = await Recommendation.find({ CVNote: { $in: userCVIds } })
                 .populate('author', 'firstname lastname')
                 .populate('CVNote', 'information')
                 .exec();

@@ -53,6 +53,9 @@ Railway
 License
 This project is licensed under the MIT License.
 
-#Huu-Nghia TRAN
-#Romain MONMARCHE
-#HADDOUCHE Othmane
+
+Participant :
+
+- Huu-Nghia TRAN
+- Romain MONMARCHE
+- HADDOUCHE Othmane

@@ -2,6 +2,7 @@ const UserModel = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
 module.exports = {
   register: async (req, res) => {
     try {
@@ -49,45 +50,58 @@ module.exports = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-
+  
       if (!email || !password) {
         return res.status(400).send({
           error: 'Email et mot de passe sont requis.'
         });
       }
-
+  
       const user = await UserModel.findOne({ email });
       if (!user) {
         return res.status(400).send({
           error: 'Utilisateur non trouvé.'
         });
       }
-
+  
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(400).send({
           error: 'Mot de passe incorrect.'
         });
       }
-
+  
+      // Générer le token
       const token = jwt.sign(
-        { userId: user._id, email: user.email }, 
-        process.env.JWT_SECRET,                   
-        { expiresIn: '1h' }                        
+        { 
+          userId: user._id, 
+          email: user.email, 
+          firstname: user.firstname,
+          lastname: user.lastname,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
       );
-
+  
       res.status(200).send({
         success: true,
         message: 'Connexion réussie.',
-        token
+        token,
+        user: {
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+        }
       });
-
     } catch (error) {
       res.status(500).send({
         message: error.message || 'Erreur lors de la connexion.'
       });
     }
-  },
+  }
+  ,
+  
+  
   
 // Deconnexion d'un utilisateur
   logout: (req, res) => {
@@ -100,19 +114,17 @@ module.exports = {
 // Suppression d'un utilisateur
 deleteUser: async (req, res) => {
     try {
-      const userId = req.params.id; // ID de l'utilisateur à supprimer
+      const userId = req.params.id; 
   
-      // Vérifier si l'utilisateur connecté a le droit de supprimer cet utilisateur
+      // Verification si l'utilisateur connecté a le droit de supprimer cet utilisateur
       if (req.user.userId !== userId) {
         return res.status(403).send({
           error: 'Vous n\'êtes pas autorisé à supprimer cet utilisateur.'
         });
       }
   
-      // Rechercher et supprimer l'utilisateur dans la base de données
       const user = await UserModel.findByIdAndDelete(userId);
   
-      // Vérifier si l'utilisateur existe
       if (!user) {
         return res.status(404).send({
           error: 'Utilisateur non trouvé.'
@@ -128,7 +140,47 @@ deleteUser: async (req, res) => {
         message: error.message || 'Erreur lors de la suppression de l\'utilisateur.'
       });
     }
-  }
+  },
+
+
+  updateUser: async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { firstname, lastname, email, password } = req.body;
+  
+      if (req.user.userId !== userId) {
+        return res.status(403).send({
+          error: 'Vous n\'êtes pas autorisé à modifier cet utilisateur.'
+        });
+      }
+  
+      const updates = {};
+      if (firstname) updates.firstname = firstname;
+      if (lastname) updates.lastname = lastname;
+      if (email) updates.email = email;
+      if (password) updates.password = await bcrypt.hash(password, 10);
+  
+      const updatedUser = await UserModel.findByIdAndUpdate(userId, updates, { new: true });
+  
+      if (!updatedUser) {
+        return res.status(404).send({
+          error: 'Utilisateur non trouvé.'
+        });
+      }
+  
+      res.status(200).send({
+        success: true,
+        message: 'Utilisateur mis à jour avec succès.',
+        user: updatedUser // Renvoie l'utilisateur MAJ
+      });
+    } catch (error) {
+      res.status(500).send({
+        message: error.message || 'Erreur lors de la mise à jour de l\'utilisateur.'
+      });
+    }
+  },
+  
+  
   
 
 

@@ -1,19 +1,20 @@
 const jwt = require('jsonwebtoken');
+const SECRET_KEY = process.env.JWT_SECRET || 'votre_clé_secrète';
 
-module.exports = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-
-  if (!token) {
-    return res.status(401).send({ error: 'Accès refusé. Token manquant.' });
+const jwtMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).send({ error: 'Token manquant ou invalide.' });
   }
 
+  const token = authHeader.split(' ')[1];
   try {
-    // Vérifier la validité du token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Token décodé:', decoded);
-    req.user = decoded;
-    next(); 
-  } catch (error) {
-    res.status(401).send({ error: 'Token invalide ou expiré.' });
+    const decoded = jwt.verify(token, SECRET_KEY);
+    req.user = decoded; // Ajouter du user décodé 
+    next();
+  } catch (err) {
+    return res.status(401).send({ error: 'Token invalide ou expiré.' });
   }
 };
+
+module.exports = jwtMiddleware;
